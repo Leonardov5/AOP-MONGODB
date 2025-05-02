@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineFlix - Catálogo de Filmes</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CineFlix</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#" id="abrir-cadastro">Adicionar Filme</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Seu catálogo de filmes</h2>
+            <p>Descubre, regista e gere os teus filmes favoritos</p>
+            <div class="search-container">
+                <input type="text" id="pesquisa" placeholder="Buscar filmes...">
+                <button id="btn-pesquisar">Buscar</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="filmes">
+        <div class="container">
+            <h2>Catálogo de Filmes</h2>
+            <div id="lista-filmes" class="grid-filmes">
+               
+            </div>
+        </div>
+    </section>
+
+    <div id="modal-filme" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2 id="modal-titulo">Adicionar Novo Filme</h2>
+            <form id="form-filme">
+                <input type="hidden" id="filme-id">
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    <input type="text" id="titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="diretor">Diretor</label>
+                    <input type="text" id="diretor" required>
+                </div>
+                <div class="form-group">
+                    <label for="ano">Ano</label>
+                    <input type="number" id="ano" required>
+                </div>
+                <div class="form-group">
+                    <label for="genero">Gênero</label>
+                    <input type="text" id="genero" required>
+                </div>
+                <div class="form-group">
+                    <label for="sinopse">Resumo</label>
+                    <textarea id="sinopse" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="posterUrl">URL do Poster</label>
+                    <input type="url" id="posterUrl">
+                </div>
+                <div class="form-group">
+                    <label for="avaliacao">Avaliação (0-10)</label>
+                    <input type="number" id="avaliacao" min="0" max="10" step="0.1">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="btn-salvar">Salvar</button>
+                    <button type="button" id="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-detalhes" class="modal">
+        <div class="modal-content modal-detalhes">
+            <span class="fechar">&times;</span>
+            <div id="detalhes-content">
+                
+            </div>
+            <div class="detalhes-actions">
+                <button id="btn-editar">Editar</button>
+                <button id="btn-excluir">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 CineFlix - Todos os direitos reservados</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
