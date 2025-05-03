@@ -15,9 +15,6 @@ app.use(cors());
 
 app.use('/api/filmes', require('./routes/filmesRoutes'));
 
-app.get('/', (req, res) => {
-  res.send('API de Filmes funcionando!');
-});
 
 const PORT = process.env.PORT || 5000;
 

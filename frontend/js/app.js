@@ -64,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
         filmeCard.dataset.id = filme._id;
         
         filmeCard.innerHTML = `
-          <img src="${filme.posterUrl}" alt="${filme.titulo}" class="filme-poster">
+          <img src="${filme.poster}" alt="${filme.title}" class="filme-poster">
           <div class="filme-info">
-            <h3>${filme.titulo}</h3>
+            <h3>${filme.title}</h3>
             <div class="filme-meta">
-              <span>${filme.ano}</span>
+              <span>${filme.year}</span>
               <div class="filme-avaliacao">
-                <span>★</span> ${filme.avaliacao.toFixed(1)}
+                <span>★</span> ${filme.imdb.rating.toFixed(1)}
               </div>
             </div>
           </div>
@@ -94,17 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const detalhesContent = document.getElementById('detalhes-content');
         detalhesContent.innerHTML = `
-          <img src="${filmeAtual.posterUrl}" alt="${filmeAtual.titulo}" class="detalhes-poster">
+          <img src="${filmeAtual.poster}" alt="${filmeAtual.title}" class="detalhes-poster">
           <div class="detalhes-info">
-            <h2>${filmeAtual.titulo} (${filmeAtual.ano})</h2>
+            <h2>${filmeAtual.title} (${filmeAtual.year})</h2>
             <div class="detalhes-meta">
-              <div>Diretor: ${filmeAtual.diretor}</div>
-              <div>Gênero: ${filmeAtual.genero}</div>
-              <div>Avaliação: ${filmeAtual.avaliacao.toFixed(1)}/10 ★</div>
+              <div>Diretor: ${filmeAtual.directors}</div>
+              <div>Gênero: ${filmeAtual.genres.join(', ')}</div>
+              <div>Avaliação: ${filmeAtual.imdb.rating.toFixed(1)}/10 ★</div>
             </div>
             <div class="detalhes-sinopse">
               <h3>Resumo</h3>
-              <p>${filmeAtual.sinopse}</p>
+              <p>${filmeAtual.plot}</p>
             </div>
           </div>
         `;
@@ -125,13 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
       modalTitulo.textContent = 'Editar Filme';
       
       document.getElementById('filme-id').value = filmeAtual._id;
-      document.getElementById('titulo').value = filmeAtual.titulo;
-      document.getElementById('diretor').value = filmeAtual.diretor;
-      document.getElementById('ano').value = filmeAtual.ano;
-      document.getElementById('genero').value = filmeAtual.genero;
-      document.getElementById('sinopse').value = filmeAtual.sinopse;
-      document.getElementById('posterUrl').value = filmeAtual.posterUrl;
-      document.getElementById('avaliacao').value = filmeAtual.avaliacao;
+      document.getElementById('titulo').value = filmeAtual.title;
+      document.getElementById('diretor').value = filmeAtual.directors;
+      document.getElementById('ano').value = filmeAtual.year;
+      document.getElementById('genero').value = filmeAtual.genres.join(', ');
+      document.getElementById('resumo').value = filmeAtual.plot;
+      document.getElementById('posterUrl').value = filmeAtual.poster;
+      document.getElementById('avaliacao').value = filmeAtual.imdb.rating;
       
       fecharModal(modalDetalhes);
       modalFilme.style.display = 'block';
@@ -143,13 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const filmeId = document.getElementById('filme-id').value;
       
       const filmeData = {
-        titulo: document.getElementById('titulo').value,
-        diretor: document.getElementById('diretor').value,
-        ano: parseInt(document.getElementById('ano').value),
-        genero: document.getElementById('genero').value,
-        sinopse: document.getElementById('sinopse').value,
-        posterUrl: document.getElementById('posterUrl').value || 'https://via.placeholder.com/500x750?text=Sem+Imagem',
-        avaliacao: parseFloat(document.getElementById('avaliacao').value) || 0
+        title: document.getElementById('titulo').value,
+        directors: document.getElementById('diretor').value,
+        year: parseInt(document.getElementById('ano').value),
+        genres: document.getElementById('genero').value.split(','),
+        plot: document.getElementById('resumo').value,
+        poster: document.getElementById('posterUrl').value || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw_HeSzHfBorKS4muw4IIeVvvRgnhyO8Gn8w&s',
+        imdb: {
+          rating: parseFloat(document.getElementById('avaliacao').value) || 0
+        }
       };
       
       try {
@@ -171,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function excluirFilmeAtual() {
       if (!filmeAtual) return;
       
-      if (confirm(`Tem certeza que deseja excluir o filme "${filmeAtual.titulo}"?`)) {
+      if (confirm(`Tem certeza que deseja excluir o filme "${filmeAtual.title}"?`)) {
         try {
           await ApiService.excluirFilme(filmeAtual._id);
           alert('Filme excluído com sucesso!');
@@ -192,9 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const resultados = filmes.filter(filme => 
-        filme.titulo.toLowerCase().includes(termo) || 
-        filme.diretor.toLowerCase().includes(termo) ||
-        filme.genero.toLowerCase().includes(termo)
+        filme.title.toLowerCase().includes(termo) || 
+        filme.directors.some(genero => genero.toLowerCase().includes(termo)) ||
+        filme.genres.some(genero => genero.toLowerCase().includes(termo))
       );
       
       renderizarFilmes(resultados);

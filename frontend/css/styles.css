@@ -9,6 +9,14 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+main {
+    flex: 1;
 }
 
 .container {
@@ -28,6 +36,11 @@ ul {
 
 button {
     cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s;
 }
 
 /* Header */
@@ -356,13 +369,11 @@ nav ul li a:hover, nav ul li a.active {
 /* Footer */
 footer {
     background-color: #032541;
-    color: white;
-    padding: 2rem 0;
+    color: #fff;
     text-align: center;
-    margin-top: 3rem;
-    position: fixed;
+    padding: 10px 0;
+    position: relative;
     bottom: 0;
-    left: 0;
     width: 100%;
 }
 

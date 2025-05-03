@@ -1,43 +1,50 @@
 const mongoose = require('mongoose');
 
 const FilmeSchema = new mongoose.Schema({
-  titulo: {
+  title: {
     type: String,
     required: [true, 'Título é obrigatório'],
     trim: true
   },
-  diretor: {
-    type: String,
-    required: [true, 'Diretor é obrigatório'],
-    trim: true
-  },
-  ano: {
+  year: {
     type: Number,
     required: [true, 'Ano é obrigatório']
   },
-  genero: {
-    type: String,
-    required: [true, 'Gênero é obrigatório'],
-    trim: true
+  genres: {
+    type: [String],
+    required: [true, 'Gêneros são obrigatórios']
   },
-  sinopse: {
+  directors: {
+    type: [String],
+    required: [true, 'Diretores são obrigatórios']
+  },
+  plot: {
     type: String,
     required: [true, 'Resumo é obrigatório']
   },
-  posterUrl: {
+  poster: {
     type: String,
-    default: 'https://via.placeholder.com/150'
+    default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw_HeSzHfBorKS4muw4IIeVvvRgnhyO8Gn8w&s'
   },
-  avaliacao: {
-    type: Number,
-    min: 0,
-    max: 10,
-    default: 0
+  imdb: {
+    rating: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0
+    },
+    votes: {
+      type: Number,
+      default: 0
+    },
+    id: {
+      type: Number
+    }
   },
-  dataAdicionado: {
+  addedAt: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = mongoose.model('Filme', FilmeSchema);
+module.exports = mongoose.model('Filme', FilmeSchema, 'movies');
