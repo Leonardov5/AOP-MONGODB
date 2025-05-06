@@ -2,12 +2,10 @@ const Comment = require('../models/Comment');
 const Filme = require('../models/Filme');
 const mongoose = require('mongoose');
 
-// Get comments for a specific movie
 exports.getCommentsByMovie = async (req, res) => {
   try {
     const movieId = req.params.movieId;
     
-    // Check if movieId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(movieId)) {
       return res.status(400).json({
         success: false,
@@ -30,12 +28,10 @@ exports.getCommentsByMovie = async (req, res) => {
   }
 };
 
-// Add a comment to a movie
 exports.addComment = async (req, res) => {
   try {
     const movieId = req.params.movieId;
     
-    // Check if movieId is valid
     if (!mongoose.Types.ObjectId.isValid(movieId)) {
       return res.status(400).json({
         success: false,
@@ -43,7 +39,6 @@ exports.addComment = async (req, res) => {
       });
     }
 
-    // Check if movie exists
     const movie = await Filme.findById(movieId);
     if (!movie) {
       return res.status(404).json({
@@ -52,7 +47,6 @@ exports.addComment = async (req, res) => {
       });
     }
 
-    // Create comment with movie_id
     const commentData = {
       ...req.body,
       movie_id: movieId
@@ -60,7 +54,6 @@ exports.addComment = async (req, res) => {
     
     const comment = await Comment.create(commentData);
 
-    // Increment num_mflix_comments in the movie document
     await Filme.findByIdAndUpdate(movieId, { 
       $inc: { num_mflix_comments: 1 } 
     });
@@ -87,7 +80,6 @@ exports.addComment = async (req, res) => {
   }
 };
 
-// Delete a comment
 exports.deleteComment = async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -99,13 +91,10 @@ exports.deleteComment = async (req, res) => {
       });
     }
 
-    // Get the movie_id before deleting the comment
     const movieId = comment.movie_id;
 
-    // Delete the comment
     await comment.remove();
 
-    // Decrement num_mflix_comments in the movie document
     await Filme.findByIdAndUpdate(movieId, { 
       $inc: { num_mflix_comments: -1 } 
     });

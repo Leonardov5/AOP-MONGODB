@@ -30,7 +30,6 @@ router
   .route('/:id/with-comments')
   .get(getFilmeWithComments);
 
-// Comments routes
 router
   .route('/:movieId/comments')
   .get(getCommentsByMovie)

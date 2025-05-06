@@ -198,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const detalhesContent = document.getElementById('detalhes-content');
             
-            // Construir bloco de informações do filme com detalhes estendidos
             let filmeMeta = '';
             if (filmeAtual.directors && filmeAtual.directors.length) {
                 filmeMeta += `<div>Realizador: ${filmeAtual.directors.join(', ')}</div>`;
@@ -266,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Adicionar listener ao formulário de comentário
             const formComentario = document.getElementById('form-comentario');
             formComentario.addEventListener('submit', (e) => adicionarComentario(e, filmeAtual._id));
 
@@ -302,10 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const comment = await ApiService.addComment(movieId, { name, email, text });
             
-            // Limpar o formulário
             document.getElementById('form-comentario').reset();
             
-            // Adicionar o novo comentário à lista
             const listaComentarios = document.getElementById('lista-comentarios');
             const noComment = listaComentarios.querySelector('.no-comments');
             if (noComment) {
@@ -347,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('posterUrl').value = filmeAtual.poster || '';
         document.getElementById('avaliacao').value = filmeAtual.imdb && filmeAtual.imdb.rating ? filmeAtual.imdb.rating : '';
         
-        // Preencher campos adicionais
         document.getElementById('runtime').value = filmeAtual.runtime || '';
         document.getElementById('cast').value = filmeAtual.cast ? filmeAtual.cast.join(', ') : '';
         document.getElementById('languages').value = filmeAtual.languages ? filmeAtual.languages.join(', ') : '';
