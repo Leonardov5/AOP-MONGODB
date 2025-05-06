@@ -3,8 +3,8 @@ const Comment = require('../models/Comment');
 
 exports.getFilmes = async (req, res) => {
   try {
-    //const filmes = await Filme.find();
-    const filmes = await Filme.find().limit(1000);
+    const filmes = await Filme.find();
+    //const filmes = await Filme.find().limit(1000);
 
     res.status(200).json({
       success: true,
@@ -53,7 +53,6 @@ exports.getFilmeWithComments = async (req, res) => {
       });
     }
 
-    // Get comments for this movie
     const comments = await Comment.find({ movie_id: req.params.id }).sort({ date: -1 });
 
     res.status(200).json({
@@ -136,7 +135,6 @@ exports.excluirFilme = async (req, res) => {
       });
     }
 
-    // Also delete all comments for this movie
     await Comment.deleteMany({ movie_id: req.params.id });
 
     res.status(200).json({

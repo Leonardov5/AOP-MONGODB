@@ -77,7 +77,6 @@ nav ul li a:hover, nav ul li a.active {
     background-color: #01b4e4;
 }
 
-/* Hero Section */
 .hero {
     background: linear-gradient(to right, #032541, #01b4e4);
     color: white;
@@ -245,23 +244,21 @@ search-container button:hover {
     border: none;
     cursor: pointer;
     padding: 0;
-    z-index: 10; /* Garante que a seta fique por cima de outros elementos */
+    z-index: 10; 
 }
 
 .btn-voltar:hover {
     color: #01b4e4;
-    transform: scale(1.2); /* Efeito de escala ao passar o mouse */
+    transform: scale(1.2);
 }
 
-/* Aumentando o espaço para o título para que não sobreponha a seta */
 #modal-titulo {
     margin-bottom: 25px;
     color: #032541;
-    margin-left: 30px; /* Adicionando margem à esquerda */
-    padding-left: 10px; /* Espaço adicional */
+    margin-left: 30px;
+    padding-left: 10px;
 }
 
-/* Formulário */
 .form-group {
     margin-bottom: 20px;
 }
@@ -317,7 +314,6 @@ search-container button:hover {
     background-color: #e0e0e0;
 }
 
-/* Detalhes do Filme */
 #detalhes-content {
     display: flex;
     gap: 30px;
@@ -329,7 +325,7 @@ search-container button:hover {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     object-fit: contain;
-    max-height: 375px; /* Proporção adequada com base na largura */
+    max-height: 375px;
 }
 
 .detalhes-info {
@@ -387,8 +383,8 @@ search-container button:hover {
 .detalhes-actions {
     display: flex;
     gap: 15px;
-    justify-content: flex-end; /* Alterado de flex-start para flex-end para alinhar à direita */
-    margin-top: 20px; /* Espaço adicional no topo */
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .detalhes-actions button {
@@ -418,7 +414,6 @@ search-container button:hover {
     background-color: #c62828;
 }
 
-/* Comentários */
 .detalhes-comentarios {
     margin-top: 30px;
     border-top: 2px solid #eee;
@@ -582,7 +577,6 @@ footer {
     width: 100%;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .grid-filmes {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
