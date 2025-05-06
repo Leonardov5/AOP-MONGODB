@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const abrirCadastro = document.getElementById('abrir-cadastro');
     const btnCancelar = document.getElementById('btn-cancelar');
+    const btnVoltar = document.getElementById('btn-voltar');
     const btnEditar = document.getElementById('btn-editar');
     const btnExcluir = document.getElementById('btn-excluir');
     const fecharBtns = document.querySelectorAll('.fechar');
@@ -21,11 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let filmesPorPagina = 48;
     let todosFilmes = [];
     let filmes = [];
+    let filmeAtual = null;
 
     carregarFilmes();
 
     abrirCadastro.addEventListener('click', () => abrirModalCadastro());
     btnCancelar.addEventListener('click', () => fecharModal(modalFilme));
+    btnVoltar.addEventListener('click', () => voltarParaDetalhes());
     formFilme.addEventListener('submit', salvarFilme);
     btnEditar.addEventListener('click', editarFilmeAtual);
     btnExcluir.addEventListener('click', excluirFilmeAtual);
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="filme-meta">
               <span>${filme.year}</span>
               <div class="filme-avaliacao">
-                <span>★</span> ${filme.imdb.rating.toFixed(1)}
+                <span>★</span> ${filme.imdb && filme.imdb.rating ? filme.imdb.rating.toFixed(1) : 'N/A'}
               </div>
             </div>
           </div>
@@ -180,31 +183,149 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filme-id').value = '';
         modalFilme.style.display = 'block';
     }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    }
 
     async function abrirDetalhes(id) {
         try {
-            filmeAtual = await ApiService.getFilme(id);
+            const data = await ApiService.getFilmeWithComments(id);
+            filmeAtual = data.filme;
+            const comments = data.comments;
 
             const detalhesContent = document.getElementById('detalhes-content');
+            
+            // Construir bloco de informações do filme com detalhes estendidos
+            let filmeMeta = '';
+            if (filmeAtual.directors && filmeAtual.directors.length) {
+                filmeMeta += `<div>Realizador: ${filmeAtual.directors.join(', ')}</div>`;
+            }
+            if (filmeAtual.genres && filmeAtual.genres.length) {
+                filmeMeta += `<div>Género: ${filmeAtual.genres.join(', ')}</div>`;
+            }
+            if (filmeAtual.imdb && filmeAtual.imdb.rating) {
+                filmeMeta += `<div>Avaliação: ${filmeAtual.imdb.rating.toFixed(1)}/10 ★ (${filmeAtual.imdb.votes || 0} votos)</div>`;
+            }
+            if (filmeAtual.runtime) {
+                filmeMeta += `<div>Duração: ${filmeAtual.runtime} minutos</div>`;
+            }
+            if (filmeAtual.cast && filmeAtual.cast.length) {
+                filmeMeta += `<div>Elenco: ${filmeAtual.cast.join(', ')}</div>`;
+            }
+            if (filmeAtual.languages && filmeAtual.languages.length) {
+                filmeMeta += `<div>Idiomas: ${filmeAtual.languages.join(', ')}</div>`;
+            }
+            if (filmeAtual.countries && filmeAtual.countries.length) {
+                filmeMeta += `<div>Países: ${filmeAtual.countries.join(', ')}</div>`;
+            }
+            if (filmeAtual.released) {
+                filmeMeta += `<div>Data de Lançamento: ${formatDate(filmeAtual.released)}</div>`;
+            }
+            if (filmeAtual.writers && filmeAtual.writers.length) {
+                filmeMeta += `<div>Argumentistas: ${filmeAtual.writers.join(', ')}</div>`;
+            }
+            if (filmeAtual.awards && filmeAtual.awards.text) {
+                filmeMeta += `<div>Prémios: ${filmeAtual.awards.text}</div>`;
+            }
+
             detalhesContent.innerHTML = `
-          <img src="${filmeAtual.poster}" alt="${filmeAtual.title}" class="detalhes-poster">
-          <div class="detalhes-info">
-            <h2>${filmeAtual.title} (${filmeAtual.year})</h2>
-            <div class="detalhes-meta">
-              <div>Diretor: ${filmeAtual.directors}</div>
-              <div>Gênero: ${filmeAtual.genres.join(', ')}</div>
-              <div>Avaliação: ${filmeAtual.imdb.rating.toFixed(1)}/10 ★</div>
-            </div>
-            <div class="detalhes-sinopse">
-              <h3>Resumo</h3>
-              <p>${filmeAtual.plot}</p>
-            </div>
-          </div>
-        `;
+                <img src="${filmeAtual.poster}" alt="${filmeAtual.title}" class="detalhes-poster">
+                <div class="detalhes-info">
+                    <h2>${filmeAtual.title} (${filmeAtual.year})</h2>
+                    <div class="detalhes-meta">
+                        ${filmeMeta}
+                    </div>
+                    ${filmeAtual.fullplot ? `
+                    <div class="detalhes-resumo">
+                        <h3>Resumo</h3>
+                        <p>${filmeAtual.fullplot}</p>
+                    </div>` : (filmeAtual.plot ? `
+                    <div class="detalhes-resumo">
+                        <h3>Resumo</h3>
+                        <p>${filmeAtual.plot}</p>
+                    </div>` : '')}
+                    
+                    <div class="detalhes-comentarios">
+                        <h3>Comentários (${comments.length})</h3>
+                        <div class="form-comentario">
+                            <h4>Adicionar um comentário</h4>
+                            <form id="form-comentario">
+                                <input type="text" id="comment-name" placeholder="O teu nome" required>
+                                <input type="email" id="comment-email" placeholder="O teu email" required>
+                                <textarea id="comment-text" placeholder="O teu comentário" required></textarea>
+                                <button type="submit">Enviar Comentário</button>
+                            </form>
+                        </div>
+                        <div id="lista-comentarios" class="lista-comentarios">
+                        ${renderizarComentarios(comments)}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Adicionar listener ao formulário de comentário
+            const formComentario = document.getElementById('form-comentario');
+            formComentario.addEventListener('submit', (e) => adicionarComentario(e, filmeAtual._id));
 
             modalDetalhes.style.display = 'block';
         } catch (error) {
             alert(`Erro ao carregar detalhes do filme: ${error.message}`);
+        }
+    }
+
+    function renderizarComentarios(comentarios) {
+        if (!comentarios || comentarios.length === 0) {
+            return '<p class="no-comments">Ainda não há comentários para este filme.</p>';
+        }
+
+        return comentarios.map(comment => `
+            <div class="comentario" data-id="${comment._id}">
+                <div class="comentario-cabecalho">
+                    <strong>${comment.name}</strong>
+                    <span class="comentario-data">${formatDate(comment.date)}</span>
+                </div>
+                <p>${comment.text}</p>
+            </div>
+        `).join('');
+    }
+
+    async function adicionarComentario(e, movieId) {
+        e.preventDefault();
+        
+        const name = document.getElementById('comment-name').value;
+        const email = document.getElementById('comment-email').value;
+        const text = document.getElementById('comment-text').value;
+        
+        try {
+            const comment = await ApiService.addComment(movieId, { name, email, text });
+            
+            // Limpar o formulário
+            document.getElementById('form-comentario').reset();
+            
+            // Adicionar o novo comentário à lista
+            const listaComentarios = document.getElementById('lista-comentarios');
+            const noComment = listaComentarios.querySelector('.no-comments');
+            if (noComment) {
+                listaComentarios.innerHTML = '';
+            }
+            
+            const comentarioElement = document.createElement('div');
+            comentarioElement.className = 'comentario';
+            comentarioElement.dataset.id = comment._id;
+            comentarioElement.innerHTML = `
+                <div class="comentario-cabecalho">
+                    <strong>${comment.name}</strong>
+                    <span class="comentario-data">${formatDate(comment.date)}</span>
+                </div>
+                <p>${comment.text}</p>
+            `;
+            
+            listaComentarios.prepend(comentarioElement);
+        } catch (error) {
+            alert(`Erro ao adicionar comentário: ${error.message}`);
         }
     }
 
@@ -219,12 +340,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('filme-id').value = filmeAtual._id;
         document.getElementById('titulo').value = filmeAtual.title;
-        document.getElementById('diretor').value = filmeAtual.directors;
+        document.getElementById('diretor').value = filmeAtual.directors ? filmeAtual.directors.join(', ') : '';
         document.getElementById('ano').value = filmeAtual.year;
-        document.getElementById('genero').value = filmeAtual.genres.join(', ');
-        document.getElementById('resumo').value = filmeAtual.plot;
-        document.getElementById('posterUrl').value = filmeAtual.poster;
-        document.getElementById('avaliacao').value = filmeAtual.imdb.rating;
+        document.getElementById('genero').value = filmeAtual.genres ? filmeAtual.genres.join(', ') : '';
+        document.getElementById('resumo').value = filmeAtual.fullplot || filmeAtual.plot || '';
+        document.getElementById('posterUrl').value = filmeAtual.poster || '';
+        document.getElementById('avaliacao').value = filmeAtual.imdb && filmeAtual.imdb.rating ? filmeAtual.imdb.rating : '';
+        
+        // Preencher campos adicionais
+        document.getElementById('runtime').value = filmeAtual.runtime || '';
+        document.getElementById('cast').value = filmeAtual.cast ? filmeAtual.cast.join(', ') : '';
+        document.getElementById('languages').value = filmeAtual.languages ? filmeAtual.languages.join(', ') : '';
+        document.getElementById('countries').value = filmeAtual.countries ? filmeAtual.countries.join(', ') : '';
+        document.getElementById('released').value = filmeAtual.released ? new Date(filmeAtual.released).toISOString().split('T')[0] : '';
+        document.getElementById('writers').value = filmeAtual.writers ? filmeAtual.writers.join(', ') : '';
+        document.getElementById('awards').value = filmeAtual.awards && filmeAtual.awards.text ? filmeAtual.awards.text : '';
+        document.getElementById('votes').value = filmeAtual.imdb && filmeAtual.imdb.votes ? filmeAtual.imdb.votes : '';
 
         fecharModal(modalDetalhes);
         modalFilme.style.display = 'block';
@@ -237,13 +368,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const filmeData = {
             title: document.getElementById('titulo').value,
-            directors: document.getElementById('diretor').value,
+            directors: document.getElementById('diretor').value.split(',').map(item => item.trim()),
             year: parseInt(document.getElementById('ano').value),
-            genres: document.getElementById('genero').value.split(','),
+            genres: document.getElementById('genero').value.split(',').map(item => item.trim()),
+            fullplot: document.getElementById('resumo').value,
             plot: document.getElementById('resumo').value,
             poster: document.getElementById('posterUrl').value || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw_HeSzHfBorKS4muw4IIeVvvRgnhyO8Gn8w&s',
+            runtime: parseInt(document.getElementById('runtime').value) || null,
+            cast: document.getElementById('cast').value ? document.getElementById('cast').value.split(',').map(item => item.trim()) : [],
+            languages: document.getElementById('languages').value ? document.getElementById('languages').value.split(',').map(item => item.trim()) : [],
+            countries: document.getElementById('countries').value ? document.getElementById('countries').value.split(',').map(item => item.trim()) : [],
+            released: document.getElementById('released').value ? new Date(document.getElementById('released').value) : null,
+            writers: document.getElementById('writers').value ? document.getElementById('writers').value.split(',').map(item => item.trim()) : [],
+            awards: {
+                text: document.getElementById('awards').value || ''
+            },
             imdb: {
-                rating: parseFloat(document.getElementById('avaliacao').value) || 0
+                rating: parseFloat(document.getElementById('avaliacao').value) || 0,
+                votes: parseInt(document.getElementById('votes').value) || 0
             }
         };
 
@@ -259,21 +401,21 @@ document.addEventListener('DOMContentLoaded', () => {
             fecharModal(modalFilme);
             carregarFilmes();
         } catch (error) {
-            alert(`Erro ao salvar filme: ${error.message}`);
+            alert(`Erro ao guardar filme: ${error.message}`);
         }
     }
 
     async function excluirFilmeAtual() {
         if (!filmeAtual) return;
 
-        if (confirm(`Tem certeza que deseja excluir o filme "${filmeAtual.title}"?`)) {
+        if (confirm(`Tem a certeza que deseja eliminar o filme "${filmeAtual.title}"?`)) {
             try {
                 await ApiService.excluirFilme(filmeAtual._id);
-                alert('Filme excluído com sucesso!');
+                alert('Filme eliminado com sucesso!');
                 fecharModal(modalDetalhes);
                 carregarFilmes();
             } catch (error) {
-                alert(`Erro ao excluir filme: ${error.message}`);
+                alert(`Erro ao eliminar filme: ${error.message}`);
             }
         }
     }
@@ -282,19 +424,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const termo = inputPesquisa.value.toLowerCase().trim();
 
         if (!termo) {
-            todosFilmes = filmes;
-        } else {
-            todosFilmes = filmes.filter(filme =>
-                filme.title.toLowerCase().includes(termo) ||
-                filme.directors.some(diretor => diretor.toLowerCase().includes(termo)) ||
-                filme.genres.some(genero => genero.toLowerCase().includes(termo))
-            );
+            carregarFilmes();
+            return;
         }
 
+        const filmesFiltrados = todosFilmes.filter(filme =>
+            filme.title.toLowerCase().includes(termo) ||
+            (filme.directors && filme.directors.some(diretor => diretor.toLowerCase().includes(termo))) ||
+            (filme.genres && filme.genres.some(genero => genero.toLowerCase().includes(termo))) ||
+            (filme.plot && filme.plot.toLowerCase().includes(termo)) ||
+            (filme.cast && filme.cast.some(ator => ator.toLowerCase().includes(termo))) ||
+            (filme.year && filme.year.toString().includes(termo))
+        );
+
         paginaAtual = 1;
-        totalPaginas = Math.ceil(todosFilmes.length / filmesPorPagina);
-        const filmesExibidos = paginarFilmes(todosFilmes, paginaAtual);
+        totalPaginas = Math.ceil(filmesFiltrados.length / filmesPorPagina);
+        const filmesExibidos = paginarFilmes(filmesFiltrados, paginaAtual);
         renderizarFilmes(filmesExibidos);
         atualizarControlesPaginacao();
+    }
+
+    function voltarParaDetalhes() {
+        fecharModal(modalFilme);
+        modalDetalhes.style.display = 'block';
     }
 });

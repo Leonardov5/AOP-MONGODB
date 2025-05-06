@@ -1,30 +1,60 @@
 const mongoose = require('mongoose');
 
 const FilmeSchema = new mongoose.Schema({
-  title: {
+  plot: {
     type: String,
-    required: [true, 'Título é obrigatório'],
-    trim: true
-  },
-  year: {
-    type: Number,
-    required: [true, 'Ano é obrigatório']
+    required: [true, 'Resumo é obrigatório']
   },
   genres: {
     type: [String],
     required: [true, 'Gêneros são obrigatórios']
   },
-  directors: {
-    type: [String],
-    required: [true, 'Diretores são obrigatórios']
+  runtime: {
+    type: Number
   },
-  plot: {
-    type: String,
-    required: [true, 'Resumo é obrigatório']
+  cast: {
+    type: [String]
+  },
+  num_mflix_comments: {
+    type: Number,
+    default: 0
   },
   poster: {
     type: String,
     default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw_HeSzHfBorKS4muw4IIeVvvRgnhyO8Gn8w&s'
+  },
+  title: {
+    type: String,
+    required: [true, 'Título é obrigatório'],
+    trim: true
+  },
+  fullplot: {
+    type: String
+  },
+  languages: {
+    type: [String]
+  },
+  released: {
+    type: Date
+  },
+  directors: {
+    type: [String],
+    required: [true, 'Diretores são obrigatórios']
+  },
+  writers: {
+    type: [String]
+  },
+  awards: {
+    wins: Number,
+    nominations: Number,
+    text: String
+  },
+  lastupdated: {
+    type: String
+  },
+  year: {
+    type: Number,
+    required: [true, 'Ano é obrigatório']
   },
   imdb: {
     rating: {
@@ -37,13 +67,19 @@ const FilmeSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
-    id: {
-      type: Number
-    }
+    id: Number
   },
-  addedAt: {
-    type: Date,
-    default: Date.now
+  countries: {
+    type: [String]
+  },
+  type: {
+    type: String,
+    default: 'movie'
+  },
+  tomatoes: {
+    viewer: {
+      lastUpdated: Date
+    }
   }
 });
 

@@ -16,10 +16,10 @@ app.use(cors());
 app.use('/api/filmes', require('./routes/filmesRoutes'));
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor a rodar na porta ${PORT}`);
 });
 
 app.use(express.static(path.join(__dirname, '../frontend')));
