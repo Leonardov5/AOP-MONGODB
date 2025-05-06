@@ -3,9 +3,7 @@ const Filme = require('../models/Filme');
 exports.getFilmes = async (req, res) => {
   try {
     //const filmes = await Filme.find();
-
-    //encontrar os primeiros 50 filmes
-    const filmes = await Filme.find().limit(50);
+    const filmes = await Filme.find().limit(1000);
 
     res.status(200).json({
       success: true,
