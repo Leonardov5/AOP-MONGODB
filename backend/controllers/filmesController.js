@@ -3,8 +3,8 @@ const Comment = require('../models/Comment');
 
 exports.getFilmes = async (req, res) => {
   try {
-    const filmes = await Filme.find();
-    //const filmes = await Filme.find().limit(1000);
+    //const filmes = await Filme.find();
+    const filmes = await Filme.find().limit(1000);
 
     res.status(200).json({
       success: true,
